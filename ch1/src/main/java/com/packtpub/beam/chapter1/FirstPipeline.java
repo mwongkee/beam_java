@@ -22,6 +22,9 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.beam.sdk.Pipeline;
+import com.packtpub.beam.util.Tokenize;
+import org.apache.beam.sdk.values.PCollection;
+import org.apache.beam.sdk.transforms.Create;
 
 public class FirstPipeline {
   public static void main(String[] args) throws IOException {
@@ -36,5 +39,11 @@ public class FirstPipeline {
     // empty Pipeline.  container for both data (PCollection)
     // and operations (PTransforms)
     Pipeline pipeline = Pipeline.create();
+
+    // Transform lines to PCollection
+    PCollection<String> input = pipeline.apply(Create.of(lines));
+
+    // lines to words
+    PCollection<String> words = input.apply(Tokenize.of());
   }
 }
