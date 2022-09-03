@@ -63,6 +63,20 @@
           </dependency>
         </dependencies>
       </plugin>
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+        <execution>
+          <phase>install</phase>
+          <goals>
+          <goal>copy-dependencies</goal>
+          </goals>
+          <configuration>
+          <outputDirectory>${project.build.directory}/lib</outputDirectory>
+          </configuration>
+          </execution>
+        </executions>
+      </plugin>
 
       <!--plugin>
         <groupId>com.diffplug.spotless</groupId>
@@ -215,9 +229,9 @@
 
   <modules>
     <module>util</module>
-    <module>ch1</module>
-    <!--module>chapter2</module>
-    <module>chapter3</module>
+    <module>chapter1</module>
+    <module>chapter2</module>
+    <!--module>chapter3</module>
     <module>chapter4</module>
     <module>chapter5</module>
     <module>chapter6</module>
