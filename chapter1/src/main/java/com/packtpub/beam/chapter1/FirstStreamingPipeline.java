@@ -19,15 +19,12 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.Timestamp;
 import java.util.List;
 
 import org.apache.beam.sdk.Pipeline;
 import com.packtpub.beam.util.Tokenize;
 import org.apache.beam.sdk.values.PCollection;
-import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.transforms.Count;
-import org.apache.beam.sdk.values.KV;
 import com.packtpub.beam.util.PrintElements;
 
 import org.apache.beam.sdk.testing.TestStream;
@@ -38,7 +35,6 @@ import java.util.stream.IntStream;
 import org.apache.beam.sdk.transforms.windowing.Window;
 import org.apache.beam.sdk.transforms.windowing.AfterPane;
 import org.apache.beam.sdk.transforms.windowing.AfterWatermark;
-import org.apache.beam.sdk.transforms.windowing.GlobalWindows;
 import org.apache.beam.sdk.transforms.windowing.FixedWindows;
 import org.joda.time.Instant;
 import org.joda.time.Duration;
@@ -49,9 +45,9 @@ public class FirstStreamingPipeline {
     ClassLoader loader = Chapter1Demo.class.getClassLoader();
     String file = loader.getResource("lorem.txt").getFile();
     List<String> lines = Files.readAllLines(Paths.get(file), StandardCharsets.UTF_8);
-    for (String line : lines) {
-      System.out.println(line);
-    }
+    // for (String line : lines) {
+    //   System.out.println(line);
+    // }
 
     // empty Pipeline.  container for both data (PCollection)
     // and operations (PTransforms)
@@ -66,7 +62,7 @@ public class FirstStreamingPipeline {
     // Add words with timestamp to stream
     List<TimestampedValue<String>> timestamped = 
       IntStream.range(0, lines.size())
-        .mapToObj(i -> TimestampedValue.of(lines.get(i), now.plus(i)))
+        .mapToObj(i -> TimestampedValue.of(lines.get(i), now.plus(i*1)))
         .collect(Collectors.toList());
 
     for (TimestampedValue<String> value: timestamped) {
@@ -79,11 +75,11 @@ public class FirstStreamingPipeline {
     PCollection<String> words = input.apply(Tokenize.of());
     // PCollection<String> windowed = words.apply(Window.<String>into(new GlobalWindows())
     Duration windowLength = Duration.standardSeconds(3);
-    Duration allowedLateness = Duration.standardSeconds(1);
+    Duration allowedLateness = Duration.standardSeconds(0);
     PCollection<String> windowed = words.apply(Window.<String>into(FixedWindows.of(windowLength))
 
       .discardingFiredPanes()
-      .triggering(AfterWatermark.pastEndOfWindow().withLateFirings(AfterPane.elementCountAtLeast(1)))
+      .triggering(AfterWatermark.pastEndOfWindow())
       .withAllowedLateness(allowedLateness)
     );
 
